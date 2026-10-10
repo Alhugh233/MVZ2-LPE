@@ -1,0 +1,14 @@
+bin/
+obj/
+
+# IDE
+.vs/
+.idea/
+*.user
+*.suo
+
+# 游戏 interop（本地放置，不入库）
+/interop
+
+# Mod 运行期调试输出
+diag.log
