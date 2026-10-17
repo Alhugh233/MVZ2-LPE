@@ -2,8 +2,8 @@
 
 using System;
 using System.Collections.Generic;
-using MVZ2.Localization;
 using MVZ2.Managers;
+using MVZ2.ResourcePacks;
 using NGettext;
 
 namespace LanguagePackEnhance;
@@ -52,9 +52,8 @@ internal static class DynamicTranslationStore
     {
         try
         {
-            var languageManager = MainManager.Instance?.LanguageManager;
-            if (languageManager != null)
-                LanguagePackInjector.Inject(languageManager);
+            if (MainManager.Instance != null)
+                LanguagePackInjector.Reinject();
         }
         catch (Exception e)
         {
@@ -63,15 +62,15 @@ internal static class DynamicTranslationStore
     }
 }
 
-/// <summary>把运行时译文构建成游戏的 <see cref="LanguagePack"/>。</summary>
+/// <summary>把运行时译文构建成游戏的 <see cref="ResourcePack"/>。</summary>
 internal static class DynamicLanguagePackBuilder
 {
-    public static LanguagePack? Build(string key, IReadOnlyList<TranslationEntry> entries)
+    public static ResourcePack? Build(string key, IReadOnlyList<TranslationEntry> entries)
     {
         if (entries == null || entries.Count == 0)
             return null;
 
-        var pack = new LanguagePack(key);
+        var pack = new ResourcePack(key, key);
         var catalogs = new Dictionary<string, Catalog>();
         foreach (var entry in entries)
         {
@@ -84,8 +83,8 @@ internal static class DynamicLanguagePackBuilder
         }
         foreach (var pair in catalogs)
         {
-            var asset = pack.GetOrCreateLanguageAsset(pair.Key);
-            asset.catalogs.Add("mod", pair.Value);
+            var languageCatalogs = pack.GetOrCreateLanguageCatalogs(pair.Key);
+            languageCatalogs.catalogs.Add("mod", pair.Value);
         }
         return pack;
     }

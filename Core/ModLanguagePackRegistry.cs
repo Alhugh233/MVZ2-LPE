@@ -85,9 +85,8 @@ internal static class ModLanguagePackRegistry
         // 如果游戏已经初始化，立即重新注入。
         try
         {
-            var languageManager = MainManager.Instance?.LanguageManager;
-            if (languageManager != null)
-                LanguagePackInjector.Inject(languageManager);
+            if (MainManager.Instance != null)
+                LanguagePackInjector.Reinject();
         }
         catch (Exception e)
         {

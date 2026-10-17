@@ -6,6 +6,8 @@ Language: English | [简体中文](README.zh-CN.md)
 
 A BepInEx 6 (IL2CPP) localization framework for **MVZ2 (Minecraft VS Zombies 2) / MVZ2Expand** mods.
 
+> **Since v1.1, this project targets the MVZ2 0.7.X base.** Support for EXPAND and other variants will return in a later version, once their sources are updated.
+
 It lets other mods expose their own text to the game's localization system, ships their own translations as embedded language packs, and lets players override/extend them with third-party language packs.
 
 ## Table of Contents
@@ -161,7 +163,13 @@ The source is split across **two sibling projects**: this repo (`LanguagePackEnh
 ```bash
 dotnet build
 # or
-dotnet build -p:InteropDir=/path/to/interop_mvz2expand
+dotnet build -p:InteropDir=/path/to/interop_mvz2
+```
+
+If the API repo is cloned under a different directory name (for example `MVZ2-LPEAPI`), point to its project explicitly:
+
+```bash
+dotnet build -p:ApiProject=../MVZ2-LPEAPI/LanguagePackEnhance.API.csproj
 ```
 
 Output: `bin/Debug/net6.0/LanguagePackEnhance.dll` + `LanguagePackEnhance.API.dll`.
@@ -175,13 +183,15 @@ Output: `bin/Debug/net6.0/LanguagePackEnhance.dll` + `LanguagePackEnhance.API.dl
 
 - Target framework: `net6.0` (BepInEx 6 IL2CPP / CoreCLR).
 - Plugin GUID: `com.mvz2.languagepackenhance`.
-- Integrates with **MVZ2Expand** (interop: `interop_mvz2expand`). Not yet verified against vanilla MVZ2.
+- Targets **MVZ2 0.7.X** (interop: the 0.7.X interop set). EXPAND support will return once its source is updated to the 0.7.X base.
+- Verified on a real device against MVZ2 0.7.X.
 
 ## Credits
 
 - **MVZ2 (original game)** by Cuerzor — <https://github.com/Cuerzor/MinecraftVsZombies2Unity>
 - **MVZ2Expand** by Tr-DESE107 — <https://github.com/Tr-DESE107/MinecraftVsZombies2_EXPAND>
 - Framework: BepInEx.
+- Plugin icon (`Resources/LanguagePackEnhance.icon.png`): the original image is from the **Minecraft VS Zombies 2 Wiki** — <https://minecraftvszombies2.wiki.gg/zh/>.
 
 ## License
 

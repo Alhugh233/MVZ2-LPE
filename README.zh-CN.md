@@ -6,6 +6,8 @@
 
 面向 **MVZ2 (Minecraft VS Zombies 2) / MVZ2Expand** Mod 的 BepInEx 6 (IL2CPP) 本地化框架。
 
+> **从 v1.1 起，本项目适配 MVZ2 0.7.X 底层。** 对 EXPAND 等改版的支持将在其源码更新后于后续版本恢复。
+
 它让其它 Mod 可以把自己的文本接入游戏的本地化体系、以**内嵌语言包**随 Mod 提供译文，并允许玩家用第三方语言包覆盖 / 扩展。
 
 ## 目录
@@ -161,7 +163,13 @@ LanguagePackEnhanceApi.ClearTranslations("MyMod");
 ```bash
 dotnet build
 # 或
-dotnet build -p:InteropDir=/path/to/interop_mvz2expand
+dotnet build -p:InteropDir=/path/to/interop_mvz2
+```
+
+如果 API 仓库的目录名不同（例如 `MVZ2-LPEAPI`），可以显式指定它的工程：
+
+```bash
+dotnet build -p:ApiProject=../MVZ2-LPEAPI/LanguagePackEnhance.API.csproj
 ```
 
 产物：`bin/Debug/net6.0/LanguagePackEnhance.dll` + `LanguagePackEnhance.API.dll`。
@@ -175,13 +183,15 @@ dotnet build -p:InteropDir=/path/to/interop_mvz2expand
 
 - 目标框架：`net6.0`（BepInEx 6 IL2CPP / CoreCLR）。
 - 插件 GUID：`com.mvz2.languagepackenhance`。
-- 面向 **MVZ2Expand** 适配（interop：`interop_mvz2expand`）。尚未在原版 MVZ2 上验证。
+- 面向 **MVZ2 0.7.X** 适配（interop：0.7.X 的 interop 集）。EXPAND 等改版将在其源码更新到 0.7.X 底层后恢复支持。
+- 已在实机上针对 MVZ2 0.7.X 验证。
 
 ## 致谢
 
 - **MVZ2（原作）** 作者 Cuerzor — <https://github.com/Cuerzor/MinecraftVsZombies2Unity>
 - **MVZ2Expand** 作者 Tr-DESE107 — <https://github.com/Tr-DESE107/MinecraftVsZombies2_EXPAND>
 - 框架：BepInEx。
+- 插件图标（`Resources/LanguagePackEnhance.icon.png`）：原图取自 **MC大战僵尸2 wiki** — <https://minecraftvszombies2.wiki.gg/zh/>。
 
 ## 许可
 

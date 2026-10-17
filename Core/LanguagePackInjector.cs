@@ -1,102 +1,104 @@
 #nullable enable
 
 using System;
+using System.Collections.Generic;
 using MVZ2.Localization;
+using MVZ2.Managers;
+using MVZ2.ResourcePacks;
 
 namespace LanguagePackEnhance;
 
 /// <summary>
-/// 把 Mod 自带语言包注入到游戏的 <see cref="LanguageManager.loadedLanguagePacks"/> 中，
-/// 位置位于第三方语言包之后、内置语言包之前，从而得到优先级：
+/// 把 Mod 自带语言包注入到 <see cref="LanguageManager.catalogProviders"/>，
+/// 位置在内置 provider 之前（第三方 provider 在更前），得到优先级：
 /// 第三方语言包 &gt; Mod 自带语言包 &gt; 游戏内置。
 /// </summary>
 internal static class LanguagePackInjector
 {
     public const string ModKeyPrefix = "modlang:";
     public const string ModDynamicKeyPrefix = "modlangdyn:";
-    private const string ModKeyRoot = "modlang";
-    public const string BuiltinKey = "builtin*";
 
-    public static void Inject(LanguageManager languageManager)
+    private static readonly List<ResourcePack> injected = new List<ResourcePack>();
+
+    public static void Reinject()
     {
+        var languageManager = MainManager.Instance?.LanguageManager;
         if (languageManager == null)
             return;
 
-        var loaded = languageManager.loadedLanguagePacks;
-        if (loaded == null)
-            return;
-
-        var registrations = ModLanguagePackRegistry.Registrations;
-        if (registrations.Count == 0 && !DynamicTranslationStore.HasAny)
-            return;
-
-        // 1. 移除上一次注入的 Mod 语言包（内嵌 + 运行时）。
-        for (int i = loaded.Count - 1; i >= 0; i--)
+        try
         {
-            var pack = loaded[i];
-            if (pack != null && pack.Key != null && pack.Key.StartsWith(ModKeyRoot, StringComparison.Ordinal))
-                loaded.RemoveAt(i);
-        }
+            var providers = languageManager.catalogProviders;
+            if (providers == null)
+                return;
 
-        // 2. 把内置语言包移动到末尾，使其优先级最低。
-        int builtinIndex = -1;
-        for (int i = 0; i < loaded.Count; i++)
-        {
-            var pack = loaded[i];
-            if (pack != null && pack.Key == BuiltinKey)
+            // 1. 移除上一次注入的 provider。
+            foreach (var old in injected)
             {
-                builtinIndex = i;
-                break;
+                try
+                {
+                    languageManager.RemoveCatalogProvider(old.Cast<ICatalogProvider>());
+                }
+                catch (Exception e)
+                {
+                    Diag.Warn($"移除旧 Mod 译文包失败：{e.Message}");
+                }
             }
-        }
-        if (builtinIndex >= 0 && builtinIndex != loaded.Count - 1)
-        {
-            var builtin = loaded[builtinIndex];
-            loaded.RemoveAt(builtinIndex);
-            loaded.Add(builtin);
-            builtinIndex = loaded.Count - 1;
-        }
+            injected.Clear();
 
-        // 3. 在内置语言包之前插入 Mod 语言包。
-        int insertAt = builtinIndex >= 0 ? loaded.Count - 1 : loaded.Count;
-        int injected = 0;
-        foreach (var registration in registrations)
-        {
-            var bytes = registration.GetBytes();
-            if (bytes == null)
-                continue;
-            try
+            // 2. 重建 Mod 语言包。
+            foreach (var registration in ModLanguagePackRegistry.Registrations)
             {
-                var pack = ModLanguagePackLoader.Load(languageManager, registration.Key, bytes);
-                if (pack == null)
+                var bytes = registration.GetBytes();
+                if (bytes == null)
                     continue;
-                loaded.Insert(insertAt + injected, pack);
-                injected++;
+                var pack = ModLanguagePackLoader.Load(registration.Key, bytes);
+                if (pack != null)
+                    injected.Add(pack);
             }
-            catch (Exception e)
-            {
-                Diag.Error($"解析 Mod 语言包 '{registration.Key}' 失败：{e}");
-            }
-        }
-
-        // 4. 插入运行时注册的译文。
-        foreach (var pair in DynamicTranslationStore.All)
-        {
-            try
+            foreach (var pair in DynamicTranslationStore.All)
             {
                 var pack = DynamicLanguagePackBuilder.Build(ModDynamicKeyPrefix + pair.Key, pair.Value);
-                if (pack == null)
-                    continue;
-                loaded.Insert(insertAt + injected, pack);
-                injected++;
+                if (pack != null)
+                    injected.Add(pack);
             }
-            catch (Exception e)
-            {
-                Diag.Error($"构建运行时译文包 '{pair.Key}' 失败：{e}");
-            }
-        }
+            if (injected.Count == 0)
+                return;
 
-        if (injected > 0)
-            Diag.Info($"已注入 {injected} 个 Mod 译文包（内嵌 + 运行时）。");
+            // 3. 插到内置 provider 之前（找不到内置则追加到末尾）。
+            int insertAt = FindBuiltinIndex(providers);
+            foreach (var pack in injected)
+            {
+                var provider = pack.Cast<ICatalogProvider>();
+                if (insertAt >= 0 && insertAt <= providers.Count)
+                {
+                    providers.Insert(insertAt, provider);
+                    insertAt++;
+                }
+                else
+                {
+                    providers.Add(provider);
+                }
+            }
+            Diag.Info($"已注入 {injected.Count} 个 Mod 译文包。");
+        }
+        catch (Exception e)
+        {
+            Diag.Error($"注入 Mod 译文包失败：{e}");
+        }
+    }
+
+    private static int FindBuiltinIndex(Il2CppSystem.Collections.Generic.List<ICatalogProvider> providers)
+    {
+        for (int i = 0; i < providers.Count; i++)
+        {
+            var provider = providers[i];
+            if (provider == null)
+                continue;
+            var pack = provider.TryCast<ResourcePack>();
+            if (pack != null && pack.Key != null && pack.Key.Contains("builtin", StringComparison.OrdinalIgnoreCase))
+                return i;
+        }
+        return -1;
     }
 }

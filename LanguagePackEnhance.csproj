@@ -4,7 +4,7 @@
     <TargetFramework>net6.0</TargetFramework>
     <AssemblyName>LanguagePackEnhance</AssemblyName>
     <Product>LanguagePackEnhance</Product>
-    <Version>1.0.0</Version>
+    <Version>1.1.0</Version>
     <BepInExPluginGuid>com.mvz2.languagepackenhance</BepInExPluginGuid>
     <AllowUnsafeBlocks>true</AllowUnsafeBlocks>
     <LangVersion>latest</LangVersion>
@@ -16,6 +16,7 @@
     </RestoreAdditionalProjectSources>
     <RootNamespace>LanguagePackEnhance</RootNamespace>
     <InteropDir Condition="'$(InteropDir)' == ''">$(MSBuildThisFileDirectory)interop</InteropDir>
+    <ApiProject Condition="'$(ApiProject)' == ''">$(MSBuildThisFileDirectory)../LanguagePackEnhance.API/LanguagePackEnhance.API.csproj</ApiProject>
   </PropertyGroup>
 
   <ItemGroup>
@@ -24,7 +25,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="$(MSBuildThisFileDirectory)../LanguagePackEnhance.API/LanguagePackEnhance.API.csproj" />
+    <ProjectReference Include="$(ApiProject)" />
   </ItemGroup>
 
   <ItemGroup>

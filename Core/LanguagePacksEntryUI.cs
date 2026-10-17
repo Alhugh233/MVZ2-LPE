@@ -6,14 +6,12 @@ using System.IO;
 using Il2CppInterop.Runtime.InteropTypes.Arrays;
 using MVZ2.Addons;
 using MVZ2.Managers;
-using MVZ2.Sprites;
-using MVZ2.UI.Addons;
 using UnityEngine;
 
 namespace LanguagePackEnhance;
 
 /// <summary>
-/// 在游戏「语言包」界面中注入一条虚拟的「Mod 自带语言包」条目。
+/// 在游戏「资源包 / 语言包」界面中注入一条虚拟的「Mod 自带语言包」条目。
 /// 它可在已启用列表中上/下移动，但始终位于内置包之上（不允许排到内置包下面）。
 /// </summary>
 internal static class LanguagePacksEntryUI
@@ -36,7 +34,7 @@ internal static class LanguagePacksEntryUI
         EntrySelected = value;
     }
 
-    public static void Refresh(LanguagePacksController controller)
+    public static void Refresh(ResourcePacksController controller)
     {
         if (!ShouldShow)
             return;
@@ -46,7 +44,7 @@ internal static class LanguagePacksEntryUI
             return;
 
         var enabled = controller.enabledReferences;
-        var languageManager = MainManager.Instance?.LanguageManager;
+        var resourcePackManager = MainManager.Instance?.ResourcePackManager;
 
         int count = enabled?.Count ?? 0;
         int builtinIndex = FindBuiltinIndex(controller);
@@ -62,12 +60,12 @@ internal static class LanguagePacksEntryUI
         if (EntrySlot < 0)
             EntrySlot = 0;
 
-        var viewDatas = new Il2CppReferenceArray<LanguagePackViewData>(count + 1);
+        var viewDatas = new Il2CppReferenceArray<ResourcePackViewData>(count + 1);
         for (int s = 0; s <= count; s++)
         {
             if (s == EntrySlot)
             {
-                viewDatas[s] = new LanguagePackViewData
+                viewDatas[s] = new ResourcePackViewData
                 {
                     name = EntryName,
                     description = BuildDescription(),
@@ -77,10 +75,10 @@ internal static class LanguagePacksEntryUI
             else
             {
                 int refIndex = s < EntrySlot ? s : s - 1;
-                var metadata = languageManager?.GetLanguagePackMetadata(enabled![refIndex]);
+                var metadata = resourcePackManager?.GetResourcePackMetadata(enabled![refIndex]);
                 viewDatas[s] = metadata == null
-                    ? new LanguagePackViewData()
-                    : new LanguagePackViewData
+                    ? new ResourcePackViewData()
+                    : new ResourcePackViewData
                     {
                         name = metadata.name ?? string.Empty,
                         description = metadata.description ?? string.Empty,
@@ -92,13 +90,13 @@ internal static class LanguagePacksEntryUI
         ui.SetEnabledLanguagePacks(viewDatas);
     }
 
-    public static bool CanMove(int delta, LanguagePacksController controller)
+    public static bool CanMove(int delta, ResourcePacksController controller)
     {
         int target = EntrySlot + delta;
         return target >= 0 && target <= FindBuiltinIndex(controller);
     }
 
-    public static void MoveEntry(int delta, LanguagePacksController controller)
+    public static void MoveEntry(int delta, ResourcePacksController controller)
     {
         if (!CanMove(delta, controller))
             return;
@@ -108,7 +106,7 @@ internal static class LanguagePacksEntryUI
         controller.ui?.SelectItemUI(true, EntrySlot);
     }
 
-    private static int FindBuiltinIndex(LanguagePacksController controller)
+    private static int FindBuiltinIndex(ResourcePacksController controller)
     {
         var enabled = controller.enabledReferences;
         int count = enabled?.Count ?? 0;
@@ -155,18 +153,17 @@ internal static class LanguagePacksEntryUI
             }
             using var memory = new MemoryStream();
             stream.CopyTo(memory);
-            var texture = SpriteHelper.LoadTextureFromBytes(memory.ToArray());
-            if (texture == null)
-                return null;
             var resourceManager = MainManager.Instance?.ResourceManager;
             if (resourceManager == null)
+                return null;
+            var texture = resourceManager.GenerateTextureFromBytes(memory.ToArray());
+            if (texture == null)
                 return null;
             entryIcon = resourceManager.CreateSprite(
                 texture,
                 new Rect(0, 0, texture.width, texture.height),
                 new Vector2(texture.width * 0.5f, texture.height * 0.5f),
-                "lpe-mod-langpack-icon",
-                "lpe_mod_icon");
+                "lpe-mod-langpack-icon");
             return entryIcon;
         }
         catch (Exception e)
