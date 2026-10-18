@@ -172,12 +172,20 @@ If the API repo is cloned under a different directory name (for example `MVZ2-LP
 dotnet build -p:ApiProject=../MVZ2-LPEAPI/LanguagePackEnhance.API.csproj
 ```
 
+The optional DSHCore integration needs a local `DSHCore.dll`. It is **not** included in this
+repo (`libs/dshcore/` is `.gitignore`d); point to a local build:
+
+```bash
+dotnet build -p:DshCoreDir=/path/to/DSHCore
+```
+
 Output: `bin/Debug/net6.0/LanguagePackEnhance.dll` + `LanguagePackEnhance.API.dll`.
 
 ### Dependencies
 
 - `BepInEx.Unity.IL2CPP`, `BepInEx.PluginInfoProps` (plugin only)
 - `LanguagePackEnhance.API` (project reference)
+- **DSHCore** (optional, by QoZnoS) — used only when present at runtime, for `UiLocale` integration
 
 ## Compatibility
 
@@ -191,6 +199,7 @@ Output: `bin/Debug/net6.0/LanguagePackEnhance.dll` + `LanguagePackEnhance.API.dl
 - **MVZ2 (original game)** by Cuerzor — <https://github.com/Cuerzor/MinecraftVsZombies2Unity>
 - **MVZ2Expand** by Tr-DESE107 — <https://github.com/Tr-DESE107/MinecraftVsZombies2_EXPAND>
 - Framework: BepInEx.
+- **DSHCore** by **QoZnoS** — <https://github.com/QoZnoS/MVZ2Mod> (optional integration).
 - Plugin icon (`Resources/LanguagePackEnhance.icon.png`): the original image is from the **Minecraft VS Zombies 2 Wiki** — <https://minecraftvszombies2.wiki.gg/zh/>.
 
 ## License

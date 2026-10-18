@@ -8,6 +8,7 @@ using HarmonyLib;
 namespace LanguagePackEnhance;
 
 [BepInPlugin(MyPluginInfo.PLUGIN_GUID, MyPluginInfo.PLUGIN_NAME, MyPluginInfo.PLUGIN_VERSION)]
+[BepInDependency(DshCoreIntegration.DshCoreGuid, BepInDependency.DependencyFlags.SoftDependency)]
 public class Plugin : BasePlugin
 {
     internal static new ManualLogSource Log = null!;
@@ -20,6 +21,9 @@ public class Plugin : BasePlugin
 
         // 注册瘦 API 的实现，供其它 Mod 通过 LanguagePackEnhanceApi 调用。
         LanguagePackEnhanceApi.Service = new LanguagePackEnhanceService();
+
+        // DSHCore 为可选依赖：存在时以 DSHCore Mod 模式运行并镜像译文。
+        DshCoreIntegration.Initialize();
 
         var harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
         harmony.PatchAll();

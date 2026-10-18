@@ -172,12 +172,20 @@ dotnet build -p:InteropDir=/path/to/interop_mvz2
 dotnet build -p:ApiProject=../MVZ2-LPEAPI/LanguagePackEnhance.API.csproj
 ```
 
+可选的 DSHCore 集成需要本地 `DSHCore.dll`。它**不随本仓库提供**（`libs/dshcore/` 已在
+`.gitignore` 中）；指向本地构建产物即可：
+
+```bash
+dotnet build -p:DshCoreDir=/path/to/DSHCore
+```
+
 产物：`bin/Debug/net6.0/LanguagePackEnhance.dll` + `LanguagePackEnhance.API.dll`。
 
 ### 依赖
 
 - `BepInEx.Unity.IL2CPP`、`BepInEx.PluginInfoProps`（仅插件）
 - `LanguagePackEnhance.API`（工程引用）
+- **DSHCore**（可选，作者 QoZnoS）—— 仅在运行时存在时用于 `UiLocale` 集成
 
 ## 兼容性
 
@@ -191,6 +199,7 @@ dotnet build -p:ApiProject=../MVZ2-LPEAPI/LanguagePackEnhance.API.csproj
 - **MVZ2（原作）** 作者 Cuerzor — <https://github.com/Cuerzor/MinecraftVsZombies2Unity>
 - **MVZ2Expand** 作者 Tr-DESE107 — <https://github.com/Tr-DESE107/MinecraftVsZombies2_EXPAND>
 - 框架：BepInEx。
+- **DSHCore** 作者 **QoZnoS** — <https://github.com/QoZnoS/MVZ2Mod>（可选集成）。
 - 插件图标（`Resources/LanguagePackEnhance.icon.png`）：原图取自 **MC大战僵尸2 wiki** — <https://minecraftvszombies2.wiki.gg/zh/>。
 
 ## 许可

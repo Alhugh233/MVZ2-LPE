@@ -17,7 +17,10 @@ internal sealed class LanguagePackEnhanceService : ILanguagePackEnhanceService
         => ModLanguagePackRegistry.Register(nsp, assembly, resourceName);
 
     public void RegisterTranslations(string nsp, IEnumerable<TranslationEntry> entries)
-        => DynamicTranslationStore.Set(nsp, entries);
+    {
+        DynamicTranslationStore.Set(nsp, entries);
+        DshCoreIntegration.MirrorTranslations(entries);
+    }
 
     public void ClearTranslations(string nsp)
         => DynamicTranslationStore.Clear(nsp);

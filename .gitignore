@@ -12,3 +12,6 @@ obj/
 
 # Mod 运行期调试输出
 diag.log
+
+# DSHCore 编译引用（不入库）
+/libs/dshcore/

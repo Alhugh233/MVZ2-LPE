@@ -82,6 +82,9 @@ internal static class ModLanguagePackRegistry
         });
         Diag.Info($"已注册 Mod 语言包：'{nsp}'（{assembly.GetName().Name}/{resourceName}）。");
 
+        // 同步镜像到 DSHCore（若存在），让 /dshtrans 能看到这些译文。
+        DshCoreIntegration.MirrorLanguagePack(assembly, resourceName, nsp);
+
         // 如果游戏已经初始化，立即重新注入。
         try
         {
