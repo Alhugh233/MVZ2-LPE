@@ -28,6 +28,9 @@ public class Plugin : BasePlugin
         var harmony = new Harmony(MyPluginInfo.PLUGIN_GUID);
         harmony.PatchAll();
 
+        // DSHCore 存在时，让 LPE 链路压在 UiLocale 之上（postfix 覆盖，见注释）。
+        Patches.LpePriorityPatch.Apply();
+
         Loaded = true;
         Log.LogInfo($"Plugin {MyPluginInfo.PLUGIN_GUID} is loaded!");
     }

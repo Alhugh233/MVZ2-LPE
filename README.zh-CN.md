@@ -15,6 +15,7 @@
 - [概述](#概述)
 - [Vibe Coding](#vibe-coding)
 - [工作原理](#工作原理)
+- [DSHCore 模式](#dshcore-模式)
 - [给 Mod 作者的 API](#给-mod-作者的-api)
 - [语言包格式](#语言包格式)
 - [音乐室元数据](#音乐室元数据)
@@ -48,6 +49,18 @@ LanguagePackEnhance（LPE）是一个**给其它 Mod 用的框架**，而不是�
 - LPE 挂 `LanguageManager.ValidateCurrentLanguage`（它在 `InitLanguagePacks` / `ReloadLanguagePacks` 末尾同步调用），把每个已注册 Mod 的 `LanguagePack` 注入游戏的 `loadedLanguagePacks`，位置在**第三方包之后、内置包之前**。于是游戏自身的顺序查找天然得到上面的优先级，不需要重写任何翻译逻辑。
 - 内置包被移动到最后，从而永远优先级最低。
 - 在语言包页上，LPE 注入一条虚拟条目（**「Mod 自带语言包」**），位于**内置包之上**。它像普通条目一样可被选中、可上移/下移，但永远不会排到内置包下面，也没有禁用/删除/导出操作。
+
+## DSHCore 模式
+
+检测到 DSHCore（`qoznos.mvz2.core`）时，LPE 还会把 Mod 译文镜像进 `UiLocale`，
+并通过 `UiOptions.DeclareMod` 声明 Mod。LPE 的优先级高于 `UiLocale`（含其外部译文文件）：
+
+```
+LPE（第三方 + Mod 语言包）> DSHCore 外部文件 > DSHCore 代码表 > 游戏内置
+```
+
+完整机制、优先级与「用语言包覆盖 DSHCore Mod 文本」见
+[docs/dshcore-localization.md](docs/dshcore-localization.md)。
 
 ## 给 Mod 作者的 API
 

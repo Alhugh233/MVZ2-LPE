@@ -15,6 +15,7 @@ It lets other mods expose their own text to the game's localization system, ship
 - [Overview](#overview)
 - [Vibe Coding](#vibe-coding)
 - [How it works](#how-it-works)
+- [DSHCore mode](#dshcore-mode)
 - [For mod authors (API)](#for-mod-authors-api)
 - [Language pack formats](#language-pack-formats)
 - [Music Room metadata](#music-room-metadata)
@@ -48,6 +49,19 @@ This project is developed with **Vibe Coding**: the code and documentation are w
 - LPE hooks `LanguageManager.ValidateCurrentLanguage` (called synchronously at the end of `InitLanguagePacks` / `ReloadLanguagePacks`) and injects each registered mod's `LanguagePack` into the game's `loadedLanguagePacks` list, **after third-party packs and before the built-in pack**. The game's own ordered lookup then yields the priority above without reimplementing any translation logic.
 - The built-in pack is moved to the end so it always has the lowest priority.
 - On the language pack page, LPE injects a single virtual entry (**"Mod 自带语言包"**). It is placed **above the built-in pack** and behaves like a normal entry: it can be selected and moved up/down, but it can never be reordered below the built-in pack, and it has no disable/delete/export actions.
+
+## DSHCore mode
+
+When DSHCore (`qoznos.mvz2.core`) is present, LPE also mirrors mod translations into `UiLocale`
+and declares the mod with `UiOptions.DeclareMod`. LPE takes precedence over `UiLocale`
+(including its external text files):
+
+```
+LPE (third-party + mod packs) > DSHCore external files > DSHCore code table > built-in
+```
+
+See [docs/dshcore-localization.md](docs/dshcore-localization.md) for the mechanism,
+priority and how to override DSHCore mod text with a language pack.
 
 ## For mod authors (API)
 
