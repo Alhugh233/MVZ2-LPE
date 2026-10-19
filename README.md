@@ -60,7 +60,7 @@ and declares the mod with `UiOptions.DeclareMod`. LPE takes precedence over `UiL
 LPE (third-party + mod packs) > DSHCore external files > DSHCore code table > built-in
 ```
 
-See [docs/dshcore-localization.md](docs/dshcore-localization.md) for the mechanism,
+See [docs/dshcore-localization.en.md](docs/dshcore-localization.en.md) for the mechanism,
 priority and how to override DSHCore mod text with a language pack.
 
 ## For mod authors (API)

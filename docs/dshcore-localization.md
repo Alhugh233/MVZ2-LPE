@@ -2,6 +2,8 @@
 
 适用：**LPE 1.2.1+**、**DSHCore 0.4.0+**、**MVZ2 0.7.X**。
 
+[English](dshcore-localization.en.md) | 简体中文
+
 本文说明 LPE 检测到 DSHCore（`qoznos.mvz2.core`）时的本地化行为、优先级，以及如何用语言包覆盖 DSHCore Mod 的文本。
 
 ## 1. 两种模式
